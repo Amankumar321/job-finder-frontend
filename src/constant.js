@@ -1,8 +1,8 @@
 const prod = {
 	url: {
-		JOBS_URL: 'https://job-finder-n2bw.onrender.com/jobs',
-		JOB_DETAIL_URL: 'https://job-finder-n2bw.onrender.com/job',
-		LOCATION_SEARCH_URL: 'https://job-finder-n2bw.onrender.com/location'
+		JOBS_URL: 'https://job-finder-bdzz.onrender.com/jobs',
+		JOB_DETAIL_URL: 'https://job-finder-bdzz.onrender.com/job',
+		LOCATION_SEARCH_URL: 'https://job-finder-bdzz.onrender.com/location'
 	},
 };
 
