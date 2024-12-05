@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button, FormControl, InputLabel, Select, MenuItem, Checkbox, FormControlLabel, Box, TextField, Autocomplete, Chip } from '@mui/material';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import { config } from '../constant';
 
@@ -26,12 +27,26 @@ const FilterSection = ({ handleFilterSubmit }) => {
     internship: false,
     remote: false,
     jobTitles: [],
-    locations: []
+    locations: [],
+    uploadedFiles: []
   });
 
   const [titleOptions, setTitleOptions] = useState([]);
   const [locationOptions, setLocationOptions] = useState([]);
   const [locationInput, setLocationInput] = useState("");
+
+  const handleFileUpload = (event) => {
+    const files = Array.from(event.target.files); // Convert FileList to an array
+    setFilters((prev) => {
+      return {...prev, uploadedFiles: [...prev.uploadedFiles, ...files]}
+    });
+  };
+  
+  const handleFileDelete = (fileToDelete) => {
+    setFilters((prev) => {
+      return {...prev, uploadedFiles: prev.uploadedFiles.filter(file => file !== fileToDelete)};
+    });
+  };
 
   useEffect(() => {
     fetchTitles().then(data => {
@@ -79,6 +94,36 @@ const FilterSection = ({ handleFilterSubmit }) => {
     <Box sx={{ marginBottom: 2 }}>
       <form onSubmit={(event) => { handleFilterSubmit(event, filters) }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <FormControl fullWidth>
+            <Button
+              variant="outlined"
+              component="label"
+              startIcon={<CloudUploadIcon />}
+            >
+              Upload Resume(s)
+              <input
+                type="file"
+                multiple
+                hidden
+                accept=".pdf,.docx,.txt"
+                files={filters.uploadedFiles}
+                onChange={handleFileUpload}
+              />
+            </Button>
+
+            {/* Display uploaded files */}
+            <Box sx={{ marginTop: 2, marginBottom: 2 }}>
+              {filters.uploadedFiles.map((file, index) => (
+                <Chip
+                  key={index}
+                  label={file.name}
+                  onDelete={() => handleFileDelete(file)}
+                  sx={{ margin: 0.5 }}
+                />
+              ))}
+            </Box>
+          </FormControl>
+
           <FormControl fullWidth>
             <InputLabel>Minimum Salary</InputLabel>
             <Select

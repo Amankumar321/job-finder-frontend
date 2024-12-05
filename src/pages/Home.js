@@ -14,13 +14,30 @@ const Home = () => {
 
     const fetchJobs = useCallback((pageNumber = 1) => {
         setLoading(true);
+
+        const formData = new FormData();
+        formData.append('page', pageNumber);
+        Object.entries(filters).forEach(([key, value]) => {
+            if (key === 'jobTitles') {
+                // Handle jobTitles as a special case, since it's an array of objects
+                value?.forEach((titleObj) => {
+                    formData.append('jobTitles[]', titleObj.title);
+                });
+            }
+            else if (key === 'uploadedFiles') {
+                // Append files if available
+                value?.forEach((file) => {
+                    formData.append('uploadedFiles[]', file);
+                });
+            }
+            else {
+                formData.append(key, value);
+            }
+        });
+
         fetch(config.url.JOBS_URL, {
             method: "POST",
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ page: pageNumber, ...filters, jobTitles: filters.jobTitles?.map(v => v.title) })
+            body: formData,
         })
         .then(res => res.json())
         .then(data => {
