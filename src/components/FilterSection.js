@@ -252,8 +252,10 @@ const FilterSection = ({ handleFilterSubmit }) => {
               disableCloseOnSelect
               options={locationOptions}
               inputValue={locationInput}
-              onInputChange={(event, value) => {
-                setLocationInput(value)
+              onInputChange={(event, value, reason) => {
+                if (reason === "input") {
+                  setLocationInput(value);
+                }
               }}
               onChange={handleJobLocationChange}
               renderOption={(props, option, { selected }) => {

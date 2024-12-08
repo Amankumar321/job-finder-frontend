@@ -30,6 +30,11 @@ const Home = () => {
                     formData.append('uploadedFiles[]', file);
                 });
             }
+            else if (key === 'locations') {
+              value?.forEach((location) => {
+                formData.append('locations[]', location);
+            });
+          }
             else {
                 formData.append(key, value);
             }
