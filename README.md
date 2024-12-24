@@ -14,4 +14,4 @@ Tech Stack - ReactJS
 
 ## Screenshots
 
-<img width="1440" alt="Screenshot" src="https://github.com/Amankumar321/ahead-app/assets/screenshot">
+<img width="1440" alt="Screenshot" src="https://github.com/Amankumar321/job-finder-frontend/blob/main/assets/screenshot.png">
