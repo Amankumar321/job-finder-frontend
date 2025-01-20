@@ -1,15 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { Button, FormControl, InputLabel, Select, MenuItem, Checkbox, FormControlLabel, Box, TextField, Autocomplete, Chip } from '@mui/material';
+import React, { useState, useEffect, useRef } from 'react';
+import { Button, FormControl, InputLabel, Select, MenuItem, ListItemText, Checkbox, FormControlLabel, Box, TextField, Autocomplete, Chip, Typography } from '@mui/material';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import { config } from '../constant';
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import moment from 'moment'
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 
 // Import JSON data
-const fetchTitles = async () => {
-  const response = await import('../titles.json');
-  return response.default;
-};
+// const fetchTitles = async () => {
+//   const response = await import('../titles.json');
+//   return response.default;
+// };
 
 const fetchLocations = async (query) => {
   const url = new URL(config.url.LOCATION_SEARCH_URL)
@@ -23,17 +28,24 @@ const FilterSection = ({ handleFilterSubmit }) => {
     minSalary: 0,
     minExperience: -1,
     maxExperience: -1,
-    minStipend: 0,
+    minEmployeeCount: -1,
+    maxEmployeeCount: -1,
+    //minStipend: 0,
     internship: false,
-    remote: false,
+    workMode: ["Onsite", "Remote", "Hybrid"],
+    keywords: [],
     jobTitles: [],
     locations: [],
-    uploadedFiles: []
+    uploadedFiles: [],
+    minTime: moment().subtract(7, 'days'),
+    maxTime: moment()
   });
 
-  const [titleOptions, setTitleOptions] = useState([]);
+  //const [titleOptions, setTitleOptions] = useState([]);
   const [locationOptions, setLocationOptions] = useState([]);
   const [locationInput, setLocationInput] = useState("");
+  const [isLocationLoading, setIsLocationLoading] = useState(false);
+  const fetchLocationsLatestId = useRef(1);
 
   const handleFileUpload = (event) => {
     const files = Array.from(event.target.files); // Convert FileList to an array
@@ -48,28 +60,56 @@ const FilterSection = ({ handleFilterSubmit }) => {
     });
   };
 
-  useEffect(() => {
-    fetchTitles().then(data => {
-      // Convert JSON data into grouped options
-      const formattedOptions = Object.entries(data).flatMap(([group, titles]) => 
-        titles.map(title => ({ group, title }))
-      );
+  const handleChangeKeywords = (event, keywords) => {
+    setFilters(prev => {
+      return {...prev, keywords: keywords}
+    })
+  }
+
+  const handleMinTimeChange = (newValue) => {
+    setFilters(prev => {
+      return {...prev, minTime: newValue}
+    })
+  }
+
+  const handleMaxTimeChange = (newValue) => {
+    setFilters(prev => {
+      return {...prev, maxTime: newValue}
+    })
+  }
+
+  // useEffect(() => {
+  //   fetchTitles().then(data => {
+  //     // Convert JSON data into grouped options
+  //     const formattedOptions = Object.entries(data).flatMap(([group, titles]) => 
+  //       titles.map(title => ({ group, title }))
+  //     );
       
-      setTitleOptions(formattedOptions);
-    });
-  }, []);
+  //     setTitleOptions(formattedOptions);
+  //   });
+  // }, []);
 
   useEffect(() => {
+    setIsLocationLoading(true)
+    setLocationOptions([])
+    const id = fetchLocationsLatestId.current + 1;
+    fetchLocationsLatestId.current = fetchLocationsLatestId.current + 1;
+    
     fetchLocations(locationInput).then(res => {
       res.json().then(data => {
-        setLocationOptions(data)
+        if (id === fetchLocationsLatestId.current) {
+          setLocationOptions(data)
+          setIsLocationLoading(false)
+        }
       })
     })
   }, [locationInput])
 
   const salary_options = [0, 1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80];
   const exp_options = [0, 1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 18, 20];
-  const stipend_options = [0, 1, 2, 3, 4, 5, 6];
+  //const stipend_options = [0, 1, 2, 3, 4, 5, 6];
+  const work_mode_options = ['Onsite', 'Remote', 'Hybrid']
+  const employee_count_options = [0, 10, 50, 100, 200, 500, 1000, 5000, 10000]
 
   const handleFilterChange = (event) => {
     setFilters({
@@ -78,9 +118,9 @@ const FilterSection = ({ handleFilterSubmit }) => {
     });
   };
 
-  const handleJobTitleChange = (event, newValue) => {
-    setFilters({ ...filters, jobTitles: newValue });
-  };
+  // const handleJobTitleChange = (event, newValue) => {
+  //   setFilters({ ...filters, jobTitles: newValue });
+  // };
 
   const handleJobLocationChange = (event, newValue) => {
     setFilters({ ...filters, locations: newValue });
@@ -94,35 +134,69 @@ const FilterSection = ({ handleFilterSubmit }) => {
     <Box sx={{ marginBottom: 2 }}>
       <form onSubmit={(event) => { handleFilterSubmit(event, filters) }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <FormControl fullWidth>
-            <Button
-              variant="outlined"
-              component="label"
-              startIcon={<CloudUploadIcon />}
-            >
-              Upload Resume(s)
-              <input
-                type="file"
-                multiple
-                hidden
-                accept=".pdf,.docx,.txt"
-                files={filters.uploadedFiles}
-                onChange={handleFileUpload}
-              />
-            </Button>
-
-            {/* Display uploaded files */}
-            <Box sx={{ marginTop: 2, marginBottom: 2 }}>
-              {filters.uploadedFiles.map((file, index) => (
-                <Chip
-                  key={index}
-                  label={file.name}
-                  onDelete={() => handleFileDelete(file)}
-                  sx={{ margin: 0.5 }}
-                />
-              ))}
+          
+          <Box border="1px solid #cccccc" p={2} borderRadius={1} display="flex" flexDirection="column" gap={2}>
+            <Box gap={1} display="flex" alignItems="center" justifyContent="center" color="ButtonText">
+              <AutoAwesomeIcon fontSize="small" style={{color: "#FFB330"}} />
+              <Typography variant="button" fontWeight={600}>
+                POWERED BY AI
+              </Typography>
             </Box>
-          </FormControl>
+
+            <FormControl fullWidth>
+              <Button
+                variant="outlined"
+                component="label"
+                startIcon={<CloudUploadIcon />}
+              >
+                Upload Resume(s)
+                <input
+                  type="file"
+                  multiple
+                  hidden
+                  accept=".pdf,.docx,.txt"
+                  files={filters.uploadedFiles}
+                  onChange={handleFileUpload}
+                />
+              </Button>
+
+              {/* Display uploaded files */}
+              <Box>
+                {filters.uploadedFiles.map((file, index) => (
+                  <Chip
+                    key={index}
+                    label={file.name}
+                    onDelete={() => handleFileDelete(file)}
+                    sx={{ margin: 0.5 }}
+                  />
+                ))}
+              </Box>
+            </FormControl>
+
+            <FormControl fullWidth>
+              <Autocomplete
+                multiple
+                options={[]}
+                freeSolo
+                onChange={handleChangeKeywords}
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => {
+                    const { key, ...tagProps } = getTagProps({ index });
+                    return (
+                      <Chip variant="filled" label={option} key={key} {...tagProps} />
+                    );
+                  })
+                }
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Keywords"
+                    placeholder="eg: Engineer, Startup, Healthcare, Freshers"
+                  />
+                )}
+              />
+            </FormControl>
+          </Box>
 
           <FormControl fullWidth>
             <InputLabel>Minimum Salary</InputLabel>
@@ -152,17 +226,26 @@ const FilterSection = ({ handleFilterSubmit }) => {
               }
               label="Internship Only"
             />
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={filters.remote}
-                  onChange={handleFilterChange}
-                  name="remote"
-                />
-              }
-              label="Remote Only"
-            />
           </Box>
+
+          <FormControl fullWidth>
+            <InputLabel>Work Mode</InputLabel>
+            <Select
+              multiple
+              value={filters.workMode}
+              name="workMode"
+              label="Work Mode"
+              onChange={handleFilterChange}
+              renderValue={(selected) => selected.join(', ')}
+            >
+              {work_mode_options.map((name) => (
+                <MenuItem key={name} value={name}>
+                  <Checkbox checked={filters.workMode.includes(name)} />
+                  <ListItemText primary={name} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
 
           <FormControl fullWidth>
             <InputLabel>Min Experience</InputLabel>
@@ -176,7 +259,7 @@ const FilterSection = ({ handleFilterSubmit }) => {
               <MenuItem value={-1}>Any</MenuItem>
               {exp_options.map(exp => (
                 <MenuItem key={exp} value={exp}>
-                  {exp}
+                  {exp + " years"}
                 </MenuItem>
               ))}
             </Select>
@@ -194,24 +277,7 @@ const FilterSection = ({ handleFilterSubmit }) => {
               <MenuItem value={-1}>Any</MenuItem>
               {exp_options.map(exp => (
                 <MenuItem key={exp} value={exp}>
-                  {exp}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          <FormControl fullWidth>
-            <InputLabel>Minimum Stipend</InputLabel>
-            <Select
-              value={filters.minStipend}
-              name="minStipend"
-              label="Minimum Stipend"
-              onChange={handleFilterChange}
-              MenuProps={{ style: { maxHeight: 400 } }}
-            >
-              {stipend_options.map(stipend => (
-                <MenuItem key={stipend} value={stipend * 100000}>
-                  {stipend} lakhs+
+                  {exp + " years"}
                 </MenuItem>
               ))}
             </Select>
@@ -221,35 +287,7 @@ const FilterSection = ({ handleFilterSubmit }) => {
             <Autocomplete
               multiple
               disableCloseOnSelect
-              options={titleOptions}
-              groupBy={(option) => option.group}
-              getOptionLabel={(option) => option.title}
-              value={filters.jobTitles}
-              onChange={handleJobTitleChange}
-              renderOption={(props, option, { selected }) => {
-                const { key, ...optionProps } = props;
-                return (
-                  <li key={key} {...optionProps}>
-                    <Checkbox
-                      icon={icon}
-                      checkedIcon={checkedIcon}
-                      style={{ marginRight: 8 }}
-                      checked={selected}
-                    />
-                    {option.title}
-                  </li>
-                );
-              }}
-              renderInput={(params) => (
-                <TextField {...params} label="Job Titles" placeholder="Select job titles" />
-              )}
-            />
-          </FormControl>
-
-          <FormControl fullWidth>
-            <Autocomplete
-              multiple
-              disableCloseOnSelect
+              loading={isLocationLoading}
               options={locationOptions}
               inputValue={locationInput}
               onInputChange={(event, value, reason) => {
@@ -277,6 +315,51 @@ const FilterSection = ({ handleFilterSubmit }) => {
               )}
             />
           </FormControl>
+
+          <FormControl fullWidth>
+            <InputLabel>Min Employee Count</InputLabel>
+            <Select
+              value={filters.minEmployeeCount}
+              name="minEmployeeCount"
+              label="Min Employee Count"
+              onChange={handleFilterChange}
+              MenuProps={{ style: { maxHeight: 400 } }}
+            >
+              <MenuItem value={-1}>Any</MenuItem>
+              {employee_count_options.map(exp => (
+                <MenuItem key={exp} value={exp}>
+                  {exp}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <FormControl fullWidth>
+            <InputLabel>Max Employee Count</InputLabel>
+            <Select
+              value={filters.maxEmployeeCount}
+              name="maxEmployeeCount"
+              label="Max Employee Count"
+              onChange={handleFilterChange}
+              MenuProps={{ style: { maxHeight: 400 } }}
+            >
+              <MenuItem value={-1}>Any</MenuItem>
+              {employee_count_options.map(exp => (
+                <MenuItem key={exp} value={exp}>
+                  {exp}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <LocalizationProvider dateAdapter={AdapterMoment}>
+            <DatePicker label="Jobs after"  value={filters.minTime} onChange={handleMinTimeChange}/>
+          </LocalizationProvider>
+
+          <LocalizationProvider dateAdapter={AdapterMoment}>
+            <DatePicker label="Jobs before" value={filters.maxTime} onChange={handleMaxTimeChange} />
+          </LocalizationProvider>
+
           <Button type="submit" variant="contained">Apply Filters</Button>
         </Box>
       </form>

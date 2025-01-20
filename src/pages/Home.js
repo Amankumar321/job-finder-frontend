@@ -3,6 +3,7 @@ import JobCard from '../components/JobCard';
 import FilterSection from '../components/FilterSection';
 import { Box, Typography, CircularProgress, Button, Grid } from '@mui/material';
 import { config } from '../constant';
+import moment from 'moment';
 
 const Home = () => {
     const [jobs, setJobs] = useState([]);
@@ -19,13 +20,11 @@ const Home = () => {
         formData.append('page', pageNumber);
         Object.entries(filters).forEach(([key, value]) => {
             if (key === 'jobTitles') {
-                // Handle jobTitles as a special case, since it's an array of objects
                 value?.forEach((titleObj) => {
                     formData.append('jobTitles[]', titleObj.title);
                 });
             }
             else if (key === 'uploadedFiles') {
-                // Append files if available
                 value?.forEach((file) => {
                     formData.append('uploadedFiles[]', file);
                 });
@@ -33,8 +32,27 @@ const Home = () => {
             else if (key === 'locations') {
               value?.forEach((location) => {
                 formData.append('locations[]', location);
-            });
-          }
+              });
+            }
+            else if (key === 'workMode') {
+              value?.forEach((workMode) => {
+                formData.append('workMode[]', workMode);
+              });
+            }
+            else if (key === 'keywords') {
+              value?.forEach((keyword) => {
+                formData.append('keywords[]', keyword);
+              });
+            }
+            else if (key === 'minTime' || key === 'maxTime') {
+              if (key === 'minTime') {
+                formData.append(key, value.startOf('day').unix() * 1000);
+                console.log(value.startOf('day').unix() * 1000)
+              } else if (key === 'maxTime') {
+                formData.append(key, value.endOf('day').unix() * 1000);
+                console.log(value.endOf('day').unix() * 1000)
+              }
+            }
             else {
                 formData.append(key, value);
             }
@@ -88,7 +106,7 @@ const Home = () => {
             </Typography>
 
             <Grid container spacing={4} display={"flex"} justifyContent={'center'}>
-                <Grid item xs={12} sm={12} md={4} lg={3}>
+                <Grid item xs={12} sm={12} md={4} lg={3} position="sticky" top={0}>
                     {/* Filters Section */}
                     <FilterSection
                         handleFilterSubmit={handleFilterSubmit}
