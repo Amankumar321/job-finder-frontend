@@ -14,4 +14,4 @@ Tech Stack - ReactJS
 
 ## Screenshots
 
-<img width="1440" alt="Screenshot" src="https://github.com/Amankumar321/job-finder-frontend/blob/main/assets/screenshot.png">
+<img width="1146" alt="Screenshot 2025-01-22 at 3 07 57 PM" src="https://github.com/user-attachments/assets/6bcdb420-52c7-4daf-bd99-e18adb7c2824" />
