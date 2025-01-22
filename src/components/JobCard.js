@@ -15,6 +15,11 @@ const convertToLakhs = (amount) => {
     return (Math.round(amount / 10000) / 10).toFixed(1);
 };
 
+const convertToThousands = (amount) => {
+  if (amount === null) return 'N/A';
+  return (Math.round(amount / 100) / 10).toFixed(1);
+};
+
 const unixToDateString = (timestamp) => {
   const date = new Date(timestamp)
   return `${date.getDate()} ${date.toLocaleString('default', { month: 'short' })}`
@@ -37,13 +42,13 @@ const JobCard = ({job, showMoreButton=true}) => {
                 <Typography variant="h6" component="div">
                     {job.title}
                 </Typography>
-                <Box display="flex" alignItems="center" gap={1}>
-                  <Typography variant="subtitle1" color="textSecondary">
+                <Box display="flex" alignItems="center" gap={1} flexWrap="wrap">
+                  <Typography variant="subtitle1" color="textSecondary" noWrap>
                       {job.company}
                   </Typography>
                   <Rating readOnly value={job.overallCompanyRating} precision={0.01} size="small"/>
                   <Chip sx={{px: 0.5}} variant="outlined" size="small" icon={<PeopleIcon fontSize="small" />} label={`${job.staffCountRangeStart}${job.staffCountRangeEnd ? " - " + job.staffCountRangeEnd : '+'}`} />
-                  <Typography variant="body2">
+                  <Typography variant="body2" noWrap>
                     <a href={`https://www.ambitionbox.com/overview/${job.urlName}-overview`} target="_blank" rel="noopener noreferrer">
                         See on Ambitionbox
                     </a>
@@ -83,7 +88,7 @@ const JobCard = ({job, showMoreButton=true}) => {
                         <Chip sx={{px: 0.5}} icon={<AccessTimeIcon fontSize="small" />} label={`${job.internshipDurationMin} - ${job.internshipDurationMax} months`} />
                     )}
                     {job.stipendMin && (
-                        <Chip sx={{px: 0.5}} icon={<PaymentsIcon fontSize="small" />} label={`${job.stipendMin / 1000}k - ${job.stipendMax / 1000}k / month`} />
+                        <Chip sx={{px: 0.5}} icon={<PaymentsIcon fontSize="small" />} label={`${convertToThousands(job.stipendMin)}k - ${convertToThousands(job.stipendMax)}k / month`} />
                     )}
                     <Chip sx={{px: 0.5}} icon={<PlaceIcon fontSize="small" />} label={job.location} />
                     <Chip sx={{px: 0.5}} icon={<CalendarMonthIcon fontSize="small" />} label={unixToDateString(job.listedAt)} />

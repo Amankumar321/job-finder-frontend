@@ -106,7 +106,7 @@ const Home = () => {
             </Typography>
 
             <Grid container spacing={4} display={"flex"} justifyContent={'center'}>
-                <Grid item xs={12} sm={12} md={4} lg={3} position="sticky" top={0}>
+                <Grid item xs={12} sm={12} md={4} lg={3}>
                     {/* Filters Section */}
                     <FilterSection
                         handleFilterSubmit={handleFilterSubmit}
