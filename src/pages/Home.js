@@ -1,8 +1,9 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import JobCard from '../components/JobCard';
 import FilterSection from '../components/FilterSection';
-import { Box, Typography, CircularProgress, Button, Grid } from '@mui/material';
+import { Box, Typography, CircularProgress, Grid } from '@mui/material';
 import { config } from '../constant';
+import Pagination from '@mui/material/Pagination';
 
 const Home = () => {
     const [jobs, setJobs] = useState([]);
@@ -11,6 +12,7 @@ const Home = () => {
     const [endOfJobs, setEndOfJobs] = useState(false);
     const [totalJobs, setTotalJobs] = useState(0);
     const [filters, setFilters] = useState({});
+    const jobListingRef = useRef(null)
 
     const fetchJobs = useCallback((pageNumber = 1) => {
         setLoading(true);
@@ -66,29 +68,41 @@ const Home = () => {
             if (data.jobs.length === 0) {
                 setEndOfJobs(true);
             }
-            setJobs(prevJobs => [...prevJobs, ...data.jobs]);
-            setPage(pageNumber + 1);
+            else {
+              setEndOfJobs(false);
+            }
+            setJobs(prevJobs => [...data.jobs]);
+            //setPage(pageNumber + 1);
             setTotalJobs(data.total);
         })
         .finally(() => setLoading(false));
     }, [filters]);
 
-    const handleScroll = useCallback(() => {
-        if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 500 && !loading && !endOfJobs) {
-            window.removeEventListener("scroll", handleScroll);
-            fetchJobs(page);
-        }
-    }, [loading, endOfJobs, fetchJobs, page]);
+    // const handleScroll = useCallback(() => {
+    //     if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 500 && !loading && !endOfJobs) {
+    //         window.removeEventListener("scroll", handleScroll);
+    //         fetchJobs(page);
+    //     }
+    // }, [loading, endOfJobs, fetchJobs, page]);
+
+    const handleChangePage = (event, pageNum) => {
+      setPage(pageNum)
+      setJobs([])
+      fetchJobs(pageNum)
+      if (jobListingRef?.current) {
+        jobListingRef.current.scrollIntoView()
+      }
+    }
 
     useEffect(() => {
         fetchJobs(); // Fetch initial jobs
     }, [fetchJobs]);
 
-    useEffect(() => {
-        if (!loading) 
-            window.addEventListener("scroll", handleScroll);
-        return () => window.removeEventListener("scroll", handleScroll);
-    }, [handleScroll, loading]);
+    // useEffect(() => {
+    //     if (!loading) 
+    //         window.addEventListener("scroll", handleScroll);
+    //     return () => window.removeEventListener("scroll", handleScroll);
+    // }, [handleScroll, loading]);
 
     const handleFilterSubmit = (event, newFilters) => {
         event.preventDefault();
@@ -113,7 +127,7 @@ const Home = () => {
                 </Grid>
                 <Grid item xs={12} sm={12} md={8} lg={6}>
                     {/* Job Listings Section */}
-                    <Box>
+                    <Box ref={jobListingRef}>
                         {jobs.map((job, i) => (
                             i % 10 !== 0?
                             <Box key={i}>
@@ -135,9 +149,12 @@ const Home = () => {
                                 No more jobs to load
                             </Typography>
                         )}
+                        {!loading && (
+                          <Pagination count={Math.floor(totalJobs / 10)+ 5} page={page} onChange={handleChangePage} />
+                        )}
                     </Box>
                     {/* Load More Button */}
-                    {!loading && !endOfJobs && (
+                    {/* {!loading && !endOfJobs && (
                         <Box sx={{ textAlign: 'center', marginTop: 2 }}>
                             <Button
                                 variant="contained"
@@ -146,7 +163,7 @@ const Home = () => {
                                 Load More
                             </Button>
                         </Box>
-                    )}
+                    )} */}
                 </Grid>
             </Grid>
 

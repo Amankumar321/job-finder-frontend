@@ -353,11 +353,11 @@ const FilterSection = ({ handleFilterSubmit }) => {
           </FormControl>
 
           <LocalizationProvider dateAdapter={AdapterMoment}>
-            <DatePicker label="Jobs after"  value={filters.minTime} onChange={handleMinTimeChange}/>
+            <DatePicker label="Jobs after" minDate={moment().subtract(7, 'days')} maxDate={moment()} value={filters.minTime} onChange={handleMinTimeChange}/>
           </LocalizationProvider>
 
           <LocalizationProvider dateAdapter={AdapterMoment}>
-            <DatePicker label="Jobs before" value={filters.maxTime} onChange={handleMaxTimeChange} />
+            <DatePicker label="Jobs before" minDate={moment().subtract(7, 'days')} maxDate={moment()} value={filters.maxTime} onChange={handleMaxTimeChange} />
           </LocalizationProvider>
 
           <Button type="submit" variant="contained">Apply Filters</Button>

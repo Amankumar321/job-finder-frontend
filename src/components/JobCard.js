@@ -30,15 +30,15 @@ const JobCard = ({job, showMoreButton=true}) => {
       'skillDevelopmentRating': 'Skill Development',
       'workLifeRating': 'Work Life Balance',
       'compensationBenefitsRating': 'Salary & Benefits',
-      'jobSecurityRating': 'Job Security',
-      'careerGrowthRating': 'Career Growth',
       'workSatisfactionRating': 'Work Satisfaction',
+      'careerGrowthRating': 'Career Growth',
+      'jobSecurityRating': 'Job Security',
       'companyCultureRating': 'Work Culture'
     }
 
     return (
-        <Card sx={{ marginBottom: 2, padding: 2 }} variant='outlined'>
-            <CardContent>
+        <Card sx={{ marginBottom: 2, padding: 1 }} variant='outlined'>
+            <CardContent >
                 <Typography variant="h6" component="div">
                     {job.title}
                 </Typography>
@@ -59,9 +59,9 @@ const JobCard = ({job, showMoreButton=true}) => {
                   {
                     Object.keys(ratings).map(key => {
                       return (
-                        <Box display="flex" alignItems="center" justifyContent="space-between" width={150}>
+                        <Box display="flex" alignItems="center" justifyContent="space-between" width={140}>
                           <Typography noWrap variant="caption">{ratings[key]}</Typography>
-                          <RatingColor rating={job[key].toFixed(2)} />
+                          <RatingColor rating={job[key].toFixed(1)} />
                         </Box>
                       )
                     })
@@ -76,24 +76,24 @@ const JobCard = ({job, showMoreButton=true}) => {
 
                 <Box display="flex" flexWrap="wrap" gap={1} my={1}>
                     {job.workMode === "Remote" && (
-                        <Chip label="Remote" sx={{backgroundColor: '#4CAF50', color: 'white', px: 0.5}} />
+                        <Chip size="small" label="Remote" sx={{backgroundColor: '#4CAF50', color: 'white', px: 0.5}} />
                     )}
                     {job.workMode === "Hybrid" && (
-                        <Chip label="Hybrid" sx={{backgroundColor: '#9933ff', color: 'white', px: 0.5}} />
+                        <Chip size="small" label="Hybrid" sx={{backgroundColor: '#9933ff', color: 'white', px: 0.5}} />
                     )}
                     {job.internship && (
-                        <Chip label="Internship" sx={{backgroundColor: '#EA504C', color: 'white', px: 0.5}} />
+                        <Chip size="small" label="Internship" sx={{backgroundColor: '#EA504C', color: 'white', px: 0.5}} />
                     )}
                     {job.internshipDurationMin && (
-                        <Chip sx={{px: 0.5}} icon={<AccessTimeIcon fontSize="small" />} label={`${job.internshipDurationMin} - ${job.internshipDurationMax} months`} />
+                        <Chip size="small" sx={{px: 0.5}} icon={<AccessTimeIcon fontSize="small" />} label={`${job.internshipDurationMin} - ${job.internshipDurationMax} months`} />
                     )}
                     {job.stipendMin && (
-                        <Chip sx={{px: 0.5}} icon={<PaymentsIcon fontSize="small" />} label={`${convertToThousands(job.stipendMin)}k - ${convertToThousands(job.stipendMax)}k / month`} />
+                        <Chip size="small" sx={{px: 0.5}} icon={<PaymentsIcon fontSize="small" />} label={`${convertToThousands(job.stipendMin)}k - ${convertToThousands(job.stipendMax)}k / month`} />
                     )}
-                    <Chip sx={{px: 0.5}} icon={<PlaceIcon fontSize="small" />} label={job.location} />
-                    <Chip sx={{px: 0.5}} icon={<CalendarMonthIcon fontSize="small" />} label={unixToDateString(job.listedAt)} />
-                    <Chip sx={{px: 0.5}} icon={<WorkIcon fontSize="small" />} label={`${job.experienceMin} - ${job.experienceMax} years`} />
-                    <Chip sx={{px: 0.5}} icon={<CurrencyRupeeIcon fontSize="small" />} label={`${convertToLakhs(job.salaryMin)} - ${convertToLakhs(job.salaryMax)} lakhs / year`} />
+                    <Chip size="small" sx={{px: 0.5}} icon={<PlaceIcon fontSize="small" />} label={job.location} />
+                    <Chip size="small" sx={{px: 0.5}} icon={<CalendarMonthIcon fontSize="small" />} label={unixToDateString(job.listedAt)} />
+                    <Chip size="small" sx={{px: 0.5}} icon={<WorkIcon fontSize="small" />} label={`${job.experienceMin} - ${job.experienceMax} years`} />
+                    <Chip size="small" sx={{px: 0.5}} icon={<CurrencyRupeeIcon fontSize="small" />} label={`${convertToLakhs(job.salaryMin)} - ${convertToLakhs(job.salaryMax)} lakhs / year`} />
                 </Box>
                 {job.skills && (
                   <Typography variant="body2">
