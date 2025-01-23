@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { config } from '../constant';
-import { Typography, Paper, Divider, Link } from '@mui/material';
+import { Typography, Paper, Divider } from '@mui/material';
 import JobCard from '../components/JobCard';
 
 

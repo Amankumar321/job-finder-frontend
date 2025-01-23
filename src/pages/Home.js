@@ -3,7 +3,6 @@ import JobCard from '../components/JobCard';
 import FilterSection from '../components/FilterSection';
 import { Box, Typography, CircularProgress, Button, Grid } from '@mui/material';
 import { config } from '../constant';
-import moment from 'moment';
 
 const Home = () => {
     const [jobs, setJobs] = useState([]);
